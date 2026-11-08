@@ -119,10 +119,14 @@ def _host_allowed(request: Request) -> bool:
     host = None if match is None else (match["v6"] or match["name"]).lower()
     if host in _LOCAL_HOSTS:
         return True
-    # Starlette's TestClient: Host "testserver" from the fake peer "testclient". A real socket
-    # peer is always an IP address, so no browser can take this branch.
+    # Starlette's TestClient: Host, peer and server are all fake names. Under uvicorn the server
+    # is the bound socket, so a forged Host plus X-Forwarded-For cannot take this branch.
+    server = request.scope.get("server") or ("", None)
     return (
-        host == "testserver" and request.client is not None and request.client.host == "testclient"
+        host == "testserver"
+        and server[0] == "testserver"
+        and request.client is not None
+        and request.client.host == "testclient"
     )
 
 
@@ -716,9 +720,7 @@ def start_pool(body: PoolBody) -> dict[str, str]:
     if not source.is_dir():
         raise HTTPException(status_code=400, detail="Kaynak klasör bulunamadı.")
     if _scan_running():
-        raise HTTPException(
-            status_code=409, detail="Tarama sürüyor. Bitince havuzu hazırlayın."
-        )
+        raise HTTPException(status_code=409, detail="Tarama sürüyor. Bitince havuzu hazırlayın.")
     with _pool_lock:
         if _pool["state"] == "running":
             raise HTTPException(status_code=409, detail="Havuz zaten hazırlanıyor.")
@@ -783,9 +785,7 @@ def scan_thumbnail(
     v: str | None = None,
 ) -> Response:
     if size not in thumbs.SIZES:
-        raise HTTPException(
-            status_code=400, detail="Önizleme boyutu 320, 640 ya da 1280 olabilir."
-        )
+        raise HTTPException(status_code=400, detail="Önizleme boyutu 320, 640 ya da 1280 olabilir.")
     try:
         folder = results.resolve_output(output)
         live = _live_copies_for(folder)
@@ -874,9 +874,7 @@ def _open_target(
         if not target.is_dir():
             if counts.get(body.slug, 0) == 0:
                 raise ResultsError(404, "Bu kişi için klasör yazılmadı; eşleşme yok.")
-            raise ResultsError(
-                404, "Kişi klasörü bulunamadı. Taşınmış ya da silinmiş olabilir."
-            )
+            raise ResultsError(404, "Kişi klasörü bulunamadı. Taşınmış ya da silinmiş olabilir.")
         return target, None
     return folder, None
 
@@ -1131,7 +1129,8 @@ def _scan_worker(source: Path, dest: Path, options: ScanOptions, slugs: list[str
                     _scan["matched"] = int(_scan["matched"]) + 1
                     _live_copies.update(copied)
                 per_person = dict(_scan["perPerson"])
-                for row in matches:
+                # A byte-identical copy is written once, so it is not counted twice either.
+                for row in matches if copied else []:
                     slug = str(row.get("slug") or "")
                     if slug in per_person:
                         per_person[slug] = int(per_person[slug]) + 1

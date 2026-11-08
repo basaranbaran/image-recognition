@@ -7,6 +7,8 @@ import json
 import os
 import re
 import shutil
+import sys
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -27,9 +29,21 @@ def write_json_atomic(path: Path, payload: object) -> None:
             json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
-        os.replace(temporary, path)
+        _replace(temporary, path)
     finally:
         temporary.unlink(missing_ok=True)
+
+
+def _replace(source: Path, target: Path, attempts: int = 6) -> None:
+    """On Windows a reader or a virus scanner holding the target blocks the rename briefly."""
+    for attempt in range(attempts):
+        try:
+            os.replace(source, target)
+            return
+        except PermissionError:
+            if not sys.platform.startswith("win") or attempt == attempts - 1:
+                raise
+            time.sleep(0.05 * (attempt + 1))
 
 
 def read_json(path: Path) -> object | None:

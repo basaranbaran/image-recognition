@@ -107,6 +107,8 @@ def _opens(path: Path) -> bool:
     try:
         with Image.open(path) as image:
             image.size  # noqa: B018 - reading the header is the check
+    except Image.DecompressionBombError:
+        return True
     except (UnidentifiedImageError, OSError):
         return False
     return True

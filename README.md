@@ -23,7 +23,7 @@ uv sync
 uv run recognize panel
 ```
 
-Panel `http://127.0.0.1:8765` adresinde açılır. Yüz bulma için YuNet (MIT), yüz tanıma için SFace (Apache 2.0) kullanılır; ikisi de OpenCV Zoo'dan gelir. İki model ilk kullanımda `modeller/` klasörüne indirilir.
+Panel `http://127.0.0.1:8765` adresinde açılır. Yüz bulma için YuNet (MIT), yüz tanıma için SFace (Apache 2.0) kullanılır; ikisi de OpenCV Zoo'dan gelir. İki model ilk kullanımda `modeller/` klasörüne indirilir (yaklaşık 39 MB). İndirme adresi sabit bir OpenCV Zoo sürümüne bağlıdır; dosya boyutu ve SHA-256 değeri doğrulanır. Yarım kalan ya da bozuk bir indirme kullanılmaz, bir sonraki açılışta yeniden indirilir.
 
 ## Panel
 
@@ -31,7 +31,7 @@ Panel üç bölümden oluşur: **Sonuçlar**, **Kişiler**, **Ayırma**. Açıl�
 
 - **Sonuçlar:** kişi başına küçük resimler, «Tümünü gör» ile tam liste, «Finder'da göster» (Windows'ta Gezgin). Küçük yüz, ikinci bakış, kıyafet desteği ve eşiğe yakın eşleşmeler «kontrol edilmeli» diye işaretlenir; «Kontrol et» süzgeci yalnızca bunları gösterir. Büyük önizlemede eşleşen yüz çerçeve içindedir.
 - **Bu kişi değil:** yanlış eşleşme kişinin klasöründen `_Yanlış eşleşmeler/<Kişi>/` altına taşınır; fotoğraf silinmez, kaynak klasöre dokunulmaz, `rapor.json` ve sayımlar güncellenir. «Geri al» dosyayı yerine koyar; yeniden yükleme ya da panel yeniden başlasa da «Ayıklananlar» listesinden geri alınabilir.
-- **Önceki taramalar:** Aynı çıktıya yeniden taranınca kişi klasöründe eski taramadan kalan dosyalar gösterilir. «Önceki taramaya taşı» bunları `_Önceki taramalar/<Kişi>/` altına alır; hiçbiri silinmez. Tarama bitmeden bu dosyalar listelenmez.
+- **Önceki taramalar:** Aynı çıktıya yeniden taranınca kişi klasöründe eski taramadan kalan dosyalar gösterilir. Bu listeye kişi klasöründe olup bu taramanın yazmadığı her fotoğraf ve video girer; bu yüzden çıktı olarak boş bir klasör ya da yalnızca bu aracın kullandığı bir klasör seçin. «Önceki taramaya taşı» bunları `_Önceki taramalar/<Kişi>/` altına alır; hiçbiri silinmez. Tarama bitmeden bu dosyalar listelenmez.
 - **Durdur:** süren ayırma dosya sınırında durur; o ana kadar işlenen dosyalar kişi klasörlerinde kalır ve rapor `complete: false` ile yazılır. Rapor zaten ilk kopyadan sonra ve her 25 dosyada bir ara kayıt olarak yazılır; yeni bir tarama eski `rapor.json`'u `veri/rapor-arsivi/` altına kopyalar (son 10 tutulur).
 - **İlerleme:** aşama, yüzde, tahmini süre (videolar örneklenen kare sayısıyla ağırlıklı), kişi başına canlı sayım ve son bulunan kare. Sekme başlığı yüzdeyi gösterir; sayfa yenilense de süren iş kaldığı yerden izlenir.
 - **Kişiler:** silmeden önce onay sorulur. Silme hemen uygulanır ve hemen çıkan «Geri al» kişiyi geri getirir (`veri/silinenler/`, 7 gün sonra temizlenir). Silinen kişinin fotoğrafları etkinlik arşivinde görünmez; dosyalar çıktı klasöründe kalır. «Kişi ekle» kamerayı boş adla açar; kayıtlı bir ad yazılırsa yeni açıların o kişiye ekleneceği söylenir. Bozuk bir kayıt diğerlerini gizlemez; panelde uyarı olarak görünür ve silinebilir.
@@ -50,7 +50,7 @@ uv run recognize tanit "Başka Kişi" on.jpg sol.jpg sag.jpg
 uv run recognize liste
 ```
 
-Grup fotoğrafında doğru yüze tıklamak için paneli kullanın. «Bu etkinlikte belirgin kıyafet» listesini yalnızca gerçekten tek renk giyen kişi için seçin.
+Grup fotoğrafında doğru yüze tıklamak için paneli kullanın. Panel 6 MB'tan büyük fotoğrafları yüklemeden önce tarayıcıda 2560 piksele küçültür (sunucu da bu boyutta bakar); 25 MB'lık kamera kareleri de bu yüzden doğrudan kullanılabilir. «Belirgin kıyafet» listesini yalnızca gerçekten tek renk giyen kişi için seçin.
 
 Aynı adla yeniden `tanit` derseniz yeni kareler eklenir, eskiler durur.
 
@@ -74,7 +74,7 @@ Ayırmadan önce «Kimler için ayrılsın?» kısmından bir, iki ya da istedi�
 
 Panelde kaynak ve çıktı klasörü yazılmaz, seçilir: karta tıklayınca macOS'ta Finder, Windows'ta Gezgin klasör penceresi açılır. Pencere açılamazsa (ör. uzak bağlantı) yol yazma kutusu çıkar. Panel, başka bir siteden gelen tarama ya da klasör isteğini reddeder.
 
-Dosya kopyalanır. Aynı karede iki kişi varsa dosya iki klasöre de yazılır. Kaynağı silmek için `--tasi`. Raporda `clothingAssisted: true`, zayıf yüzün kıyafet rengiyle desteklendiği anlamına gelir.
+Dosya kopyalanır. Aynı karede iki kişi varsa dosya iki klasöre de yazılır. Kişi klasöründe aynı adda bir dosya varsa üzerine yazılmaz: içerik aynıysa zaten yazılmış sayılır, farklıysa yeni dosya `IMG_0001 (2).JPG` gibi numaralı bir adla yazılır. Böylece kamera numaraları tekrar eden iki etkinlik aynı çıktıya taransa da hiçbir fotoğraf ezilmez. Kaynağı silmek için `--tasi`. Raporda `clothingAssisted: true`, zayıf yüzün kıyafet rengiyle desteklendiği anlamına gelir.
 
 Birebir aynı içerikteki dosyalar bir kez incelenir ve kişi klasörüne bir kez yazılır; kopyalar raporda `duplicateOf` ile ilk dosyayı gösterir. `--tasi` seçiliyse taşınan dosyanın kopyaları da kaynaktan silinir. 0 baytlık dosyalar hata sayılmaz, `skipped` ile atlanır.
 
@@ -85,6 +85,8 @@ Her eşleşmede `facePx` yüzün kısa kenarıdır. 32 pikselden küçük yüzle
 ## Sınırlar
 
 Çok küçük, arkası dönük veya karanlık yüzler kaçabilir. Fotoğraflar 1920 piksele küçültülüp taranır. 3200 piksel denendi: 20 fotoğraf daha buldu ama bunların çoğu, arka sıradaki 26–43 piksellik yüzlerde başka bir kişiydi. Bu yüzden 1920'de kalındı. Kapalı göz ve yan profil özel olarak elenmez. Kıyafet rengi yalnızca o kişiye kayıtlıysa devreye girer. Karede sarı bir şey olması, o kişinin yüzü yoksa dosyayı klasöre koymaz.
+
+Araç macOS'ta geliştirildi ve orada denendi. Windows ve Linux için klasör penceresi, UTF-8 yol aktarımı ve dosya adı kuralları var (kişi klasörü adında `<>:"|?*` boşluğa çevrilir, `CON` gibi ayrılmış adlara `_` eklenir; bu exFAT USB diskler için de geçerlidir), ama bu sistemlerde gerçek bir makinede test edilmedi. Mac'te oluşturulmuş, ayrışık Unicode (NFD) adlı klasörler Windows'a ya da Linux'a taşınırsa panel bazı önizlemeleri bulamayabilir.
 
 ## Lisans
 

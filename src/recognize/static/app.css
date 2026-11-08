@@ -240,6 +240,25 @@ h3 {
   text-overflow: ellipsis;
 }
 
+/* Parent folders give way first; the chosen folder's own name stays visible on a phone. */
+.path.split {
+  display: flex;
+  min-width: 0;
+}
+
+.path-head {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.path-tail {
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .ic {
   width: 20px;
   height: 20px;
@@ -1580,6 +1599,19 @@ dialog::backdrop {
   align-items: center;
   gap: var(--s2);
   flex-wrap: wrap;
+}
+
+/* On a phone the close button stays in the top right corner; the tools wrap below the name. */
+@media (max-width: 600px) {
+  .sheet-title {
+    padding-right: 48px;
+  }
+
+  #sheet-close {
+    position: absolute;
+    top: var(--s4);
+    right: var(--s4);
+  }
 }
 
 .filters {

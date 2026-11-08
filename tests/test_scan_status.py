@@ -77,6 +77,9 @@ def test_status_carries_the_scan_context(home, tmp_path: Path, monkeypatch) -> N
             "uncertain": [],
         }
         hooks.on_file(record, 0.2)
+        # b.jpg is a byte-identical copy of a.jpg: same match, nothing written, not counted again.
+        duplicate = {**record, "source": "b.jpg", "copiedTo": [], "duplicateOf": "a.jpg"}
+        hooks.on_file(duplicate, 0.1)
         hooks.archive(dst)
         dst.mkdir(parents=True, exist_ok=True)
         (dst / "rapor.json").write_text("{}", encoding="utf-8")
@@ -107,7 +110,7 @@ def test_status_carries_the_scan_context(home, tmp_path: Path, monkeypatch) -> N
     assert status["lastMatch"]["path"] == "Emre Kaya/a.jpg"
     assert status["lastMatch"]["slug"] == slug
     assert status["lastMatch"]["thumb"].startswith("/api/sonuclar/onizleme?")
-    assert status["units"] == {"done": 1.0, "total": 2.0}
+    assert status["units"] == {"done": 2.0, "total": 2.0}
     assert status["startedAt"] and status["finishedAt"]
     assert status["elapsedSeconds"] >= 0
     assert status["cancelRequested"] is False

@@ -109,9 +109,7 @@ def _render_image(path: Path, size: int) -> bytes:
 
 
 def _flatten(image: Image.Image) -> Image.Image:
-    has_alpha = image.mode in {"RGBA", "LA"} or (
-        image.mode == "P" and "transparency" in image.info
-    )
+    has_alpha = image.mode in {"RGBA", "LA"} or (image.mode == "P" and "transparency" in image.info)
     if has_alpha:
         rgba = image.convert("RGBA")
         white = Image.new("RGB", rgba.size, (255, 255, 255))

@@ -8,7 +8,7 @@
     <title>Etkinlik arşivi</title>
     <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
     <script src="/static/theme.js?v=1"></script>
-    <link rel="stylesheet" href="/static/app.css?v=12" />
+    <link rel="stylesheet" href="/static/app.css?v=13" />
   </head>
   <body>
     <svg hidden aria-hidden="true" focusable="false">
@@ -283,7 +283,7 @@
       </section>
 
       <footer class="footnote t-footnote muted measure">
-        YuNet ve SFace (OpenCV, Apache 2.0) bu bilgisayarda çalışır. Fotoğraflar, yüz vektörleri ve
+        YuNet (MIT) ve SFace (Apache 2.0) bu bilgisayarda çalışır. Fotoğraflar, yüz vektörleri ve
         raporlar hiçbir yere yüklenmez.
       </footer>
     </main>
@@ -343,14 +343,14 @@
           <input id="files" name="files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple />
           <svg class="ic big" aria-hidden="true"><use href="#i-image" /></svg>
           <span class="t-headline">Fotoğrafları seçin veya buraya bırakın</span>
-          <span class="t-footnote muted">JPG, PNG, WebP veya HEIC · en fazla 12 dosya, her biri 20 MB</span>
+          <span class="t-footnote muted">JPG, PNG, WebP veya HEIC · en fazla 12 dosya · büyük fotoğraflar yüklenmeden önce küçültülür</span>
           <span class="t-footnote" id="drop-status" role="status"></span>
         </label>
 
         <div id="preview" class="preview"></div>
 
         <div class="field">
-          <label class="t-headline" for="clothing">Bu etkinlikte belirgin kıyafet</label>
+          <label class="t-headline" for="clothing">Belirgin kıyafet (isteğe bağlı)</label>
           <select id="clothing" name="clothing">
             <option value="">Yok</option>
             <option value="sari">sarı</option>
@@ -390,6 +390,6 @@
 
     <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
     <div class="sr-only" id="announce" aria-live="polite" aria-atomic="true"></div>
-    <script src="/static/app.js?v=13"></script>
+    <script src="/static/app.js?v=14"></script>
   </body>
 </html>

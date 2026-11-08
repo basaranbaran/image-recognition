@@ -56,9 +56,17 @@ def clean_person_name(name: str) -> str:
     return cleaned
 
 
+_RESERVED = {"CON", "PRN", "AUX", "NUL"} | {
+    f"{kind}{n}" for kind in ("COM", "LPT") for n in range(1, 10)
+}
+
+
 def folder_name(name: str) -> str:
-    cleaned = clean_person_name(name).replace(":", " ")
-    cleaned = re.sub(r"\s+", " ", cleaned).strip().rstrip(".")
+    """The person's folder name; also valid on Windows and on exFAT USB drives."""
+    cleaned = re.sub(r'[<>:"|?*\x00-\x1f]', " ", clean_person_name(name))
+    cleaned = re.sub(r"\s+", " ", cleaned).strip().rstrip(". ")
     if cleaned in {"", ".", ".."}:
         raise AppError("Kişi adı klasör adı olamıyor.")
+    if cleaned.split(".")[0].upper() in _RESERVED:
+        cleaned = f"{cleaned}_"
     return cleaned

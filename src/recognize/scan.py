@@ -20,6 +20,7 @@ from recognize.media import (
     content_groups,
     directories_overlap,
     output_name,
+    same_content,
 )
 from recognize.store import write_json_atomic
 from recognize.textutil import folder_name
@@ -197,7 +198,10 @@ class _ReportWriter:
         )
         if not due:
             return
-        self.write(build())
+        try:
+            self.write(build())
+        except OSError:
+            logging.exception("Could not write a report checkpoint")
 
     def write(self, report: dict[str, object]) -> None:
         if not self._archived:
@@ -361,12 +365,26 @@ def _copy_record(
 
 
 def _place(source: Path, dest_dir: Path, name: str) -> Path:
+    """Write into the person folder without ever replacing a file that is already there.
+
+    The same content counts as already written, so a repeated scan adds nothing. A different
+    file under the same name (camera numbering restarts every event) keeps its place and the
+    new one gets ``name (2).jpg``; with ``--tasi`` the old copy may be the only one left.
+    """
     dest_dir.mkdir(parents=True, exist_ok=True)
     target = dest_dir / name
     if target.resolve() == source.resolve():
         raise AppError("Kaynak ile çıktı aynı dosya.")
     # Resolve first: a symlinked photo becomes a real file under its own name, never a link.
-    clone_file(source.resolve(), target)
+    real = source.resolve()
+    stem, suffix = target.stem, target.suffix
+    number = 1
+    while target.exists() or target.is_symlink():
+        if target.is_file() and not target.is_symlink() and same_content(real, target):
+            return target
+        number += 1
+        target = dest_dir / f"{stem} ({number}){suffix}"
+    clone_file(real, target)
     return target
 
 

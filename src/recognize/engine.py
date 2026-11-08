@@ -10,6 +10,12 @@ import cv2
 import numpy as np
 from PIL import Image
 
+try:
+    # OpenCV 5 warns on every model load that the default DNN target is ignored; nothing to act on.
+    cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_ERROR)
+except AttributeError:
+    pass
+
 from recognize.clothing import ClothingHint, clothing_matches
 from recognize.errors import AppError
 from recognize.gallery import Person

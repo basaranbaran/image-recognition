@@ -33,9 +33,7 @@ def test_cross_site_api_reads_are_refused_but_the_page_opens(home) -> None:
     with TestClient(app) as client:
         refused = client.get("/api/kisiler", headers={"Sec-Fetch-Site": "cross-site"})
         assert refused.status_code == 403
-        cover = client.get(
-            "/api/kisiler/kimse/kapak.jpg", headers={"Sec-Fetch-Site": "cross-site"}
-        )
+        cover = client.get("/api/kisiler/kimse/kapak.jpg", headers={"Sec-Fetch-Site": "cross-site"})
         assert cover.status_code == 403
         assert client.get("/", headers={"Sec-Fetch-Site": "cross-site"}).status_code == 200
         for value in ("same-origin", "none"):

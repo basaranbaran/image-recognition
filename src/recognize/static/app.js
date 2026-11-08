@@ -169,8 +169,26 @@ function plural(n, word) {
 
 /* ---------- Toasts ---------- */
 
+function toastHost() {
+  // A modal dialog makes everything outside it inert: a toast behind the person sheet could be
+  // neither read nor undone. The toast area moves into the topmost open modal instead.
+  const modals = [...document.querySelectorAll("dialog[open]")].filter((d) => d.matches(":modal"));
+  return modals.at(-1) || document.body;
+}
+
+document.addEventListener(
+  "close",
+  (event) => {
+    const root = $("toasts");
+    if (root && root.parentElement === event.target) document.body.append(root);
+  },
+  true,
+);
+
 function toast(text, { action, onAction, kind, duration = 8000 } = {}) {
   const root = $("toasts");
+  const host = toastHost();
+  if (root.parentElement !== host) host.append(root);
   const node = el("div", kind ? `toast ${kind}` : "toast");
   node.append(el("p", "", text));
   let timer = 0;
@@ -1169,28 +1187,61 @@ function paintPressed() {
   }
 }
 
+const UPLOAD_LIMIT = 20 * 1024 * 1024;
+const SHRINK_ABOVE = 6 * 1024 * 1024;
+const SERVER_EDGE = 2560; // /api/onizleme resizes to this edge before looking for faces
+
+async function shrinkForUpload(file) {
+  // Event cameras write 25 MB frames; the server would scale them to 2560 px anyway.
+  if (file.size <= SHRINK_ABOVE || typeof createImageBitmap !== "function") return file;
+  let bitmap;
+  try {
+    bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  } catch {
+    return file; // HEIC outside Safari: sent as is, the size check still applies
+  }
+  try {
+    const scale = Math.min(1, SERVER_EDGE / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.92));
+    return blob ? new File([blob], file.name, { type: "image/jpeg" }) : file;
+  } finally {
+    bitmap.close();
+  }
+}
+
 async function sendPreview(fileList) {
-  const files = [...fileList];
-  if (!files.length) return;
+  const picked = [...fileList];
+  if (!picked.length) return;
   const status = $("drop-status");
-  if (files.length > 12) {
+  if (picked.length > 12) {
     setText("drop-status", "Bir seferde en fazla 12 fotoğraf seçin.");
     setKind(status, "bad");
     return;
   }
-  const big = files.find((file) => file.size > 20 * 1024 * 1024);
+  const stamp = Symbol("preview");
+  state.enroll.stamp = stamp;
+  $("save").disabled = true;
+  setKind(status, null);
+  const files = [];
+  for (const file of picked) {
+    if (file.size > SHRINK_ABOVE) setText("drop-status", `${file.name} küçültülüyor…`);
+    files.push(await shrinkForUpload(file)); // one at a time: a 6000 px frame is ~100 MB decoded
+    if (state.enroll.stamp !== stamp) return;
+  }
+  const big = files.find((file) => file.size > UPLOAD_LIMIT);
   if (big) {
-    setText("drop-status", `${big.name} 20 MB sınırını aşıyor (${fmt.bytes(big.size)}).`);
+    setText("drop-status", `${big.name} açılamadı ve 20 MB sınırını aşıyor (${fmt.bytes(big.size)}).`);
     setKind(status, "bad");
+    $("save").disabled = false;
     return;
   }
   const body = new FormData();
   for (const file of files) body.append("files", file, file.name);
   setText("drop-status", `${plural(files.length, "fotoğraf")} inceleniyor…`);
-  setKind(status, null);
-  $("save").disabled = true;
-  const stamp = Symbol("preview");
-  state.enroll.stamp = stamp;
   try {
     const data = await api("/api/onizleme", { method: "POST", body });
     if (state.enroll.stamp !== stamp) return;
@@ -1302,17 +1353,22 @@ function splitPath(path) {
   return { parent: trimmed.slice(0, cut), name: trimmed.slice(cut + 1), sep: trimmed[cut] };
 }
 
-function prettyPath(path) {
-  let text = path.replace(/^\/Users\/[^/]+(?=\/|$)/, "~").replace(/^C:\\Users\\[^\\]+(?=\\|$)/, "~");
-  if (text.length > 64) text = `${text.slice(0, 26)}…${text.slice(-34)}`;
-  return text;
+function homePath(path) {
+  return path.replace(/^\/Users\/[^/]+(?=\/|$)/, "~").replace(/^C:\\Users\\[^\\]+(?=\\|$)/, "~");
 }
 
 function showFolder(target) {
   const value = $(target).value.trim();
   const node = $(`${target}-path`);
-  node.textContent = value ? prettyPath(value) : "Seçilmedi";
   node.title = value;
+  node.classList.toggle("split", Boolean(value));
+  if (!value) {
+    node.textContent = "Seçilmedi";
+  } else {
+    // The parent shrinks with an ellipsis; the folder's own name always stays readable.
+    const { parent, name, sep } = splitPath(homePath(value));
+    node.replaceChildren(el("span", "path-head", parent ? parent + sep : ""), el("span", "path-tail", name));
+  }
   $(`${target}-pick`).textContent = value ? "Değiştir…" : "Seç…";
   updatePreflight();
 }

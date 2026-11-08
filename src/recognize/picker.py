@@ -50,6 +50,8 @@ _POWERSHELL = (
     "$d.ShowNewFolderButton = $true;"
     "if ($d.ShowDialog() -eq 'OK') { [Console]::Out.Write($d.SelectedPath) }"
 )
+# Without this the chosen path comes back in the ANSI/OEM code page: "fotoğraf" turns "foto?raf".
+_POWERSHELL_UTF8 = "[Console]::OutputEncoding = New-Object System.Text.UTF8Encoding($false);"
 
 
 def platform_name() -> str:
@@ -107,9 +109,11 @@ def _pick_windows(title: str, start: str) -> str | None:
         raise AppError("Klasör penceresi açılamadı. Yolu elle yazın.")
     env = {**os.environ, "RECOGNIZE_PICK_TITLE": title, "RECOGNIZE_PICK_START": start}
     done = subprocess.run(
-        [shell, "-NoProfile", "-STA", "-Command", _POWERSHELL],
+        [shell, "-NoProfile", "-STA", "-Command", _POWERSHELL_UTF8 + _POWERSHELL],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         env=env,
         check=False,
     )
@@ -142,6 +146,9 @@ def _run_tk(title: str, start: str) -> subprocess.CompletedProcess[str] | None:
             [sys.executable, "-c", _TK_SCRIPT, title, start],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
             check=False,
         )
     except OSError:

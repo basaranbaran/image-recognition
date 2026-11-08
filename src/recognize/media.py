@@ -158,6 +158,8 @@ def decode_image(data: bytes) -> np.ndarray:
         with Image.open(io.BytesIO(data)) as image:
             image = ImageOps.exif_transpose(image)
             rgb = np.asarray(image.convert("RGB"))
+    except Image.DecompressionBombError as exc:
+        raise AppError("Fotoğraf çok büyük (180 megapikselin üstünde); taranmadı.") from exc
     except (UnidentifiedImageError, OSError) as exc:
         raise AppError("Fotoğraf okunamadı.") from exc
     return cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)

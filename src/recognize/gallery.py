@@ -247,9 +247,7 @@ def present_slugs(root: Path | None = None) -> set[str]:
     if not base.is_dir():
         return set()
     return {
-        entry.name
-        for entry in base.iterdir()
-        if entry.is_dir() and not entry.name.startswith(".")
+        entry.name for entry in base.iterdir() if entry.is_dir() and not entry.name.startswith(".")
     }
 
 

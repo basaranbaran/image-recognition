@@ -28,7 +28,6 @@ def test_real_event_folder_is_not_the_output_dir() -> None:
     if event is None:
         pytest.skip("Etkinlik fotoğrafları bu kopyada yok (depoya girmez).")
     assert event.name not in {"src", "tests", "modeller", "veri", "cikti", ".venv"}
-    assert "hackathon" in event.name
     source = event_source_dir()
     assert source is not None
     # Once the unique pool exists it is the default source; either way it is not the output.

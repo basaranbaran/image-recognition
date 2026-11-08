@@ -74,9 +74,7 @@ def load_report(output: Path) -> dict[str, object]:
     try:
         stat = path.stat()
     except OSError as exc:
-        raise ResultsError(
-            404, "Bu klasörde tarama raporu yok. Önce ayırmayı başlatın."
-        ) from exc
+        raise ResultsError(404, "Bu klasörde tarama raporu yok. Önce ayırmayı başlatın.") from exc
     stamp = (stat.st_mtime_ns, stat.st_size)
     with _cache_lock:
         cached = _cache.get(path)

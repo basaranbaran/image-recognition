@@ -56,7 +56,7 @@ TANIT_HELP = (
 )
 
 
-@app.command("tanit", help=TANIT_HELP)
+@app.command("tanit", help=TANIT_HELP, short_help="Fotoğraflardan bir kişiyi tanıtır.")
 def enroll_command(
     ad: Annotated[str, typer.Argument(help="Kişinin adı")],
     fotolar: Annotated[list[Path], typer.Argument(help="Tanıtım fotoğrafları", exists=True)],
@@ -163,7 +163,14 @@ def remove_command(ad: Annotated[str, typer.Argument(help="Ad veya kısa ad")]) 
     console.print(f"Silindi: {person.name}")
 
 
-@app.command("tara", help=f"{THRESHOLD_HINT} {VIDEO_INTERVAL_HINT}")
+@app.command(
+    "tara",
+    help=(
+        "Etkinlik klasörünü tarar, eşleşen dosyaları kişi klasörlerine kopyalar. "
+        f"{THRESHOLD_HINT} {VIDEO_INTERVAL_HINT}"
+    ),
+    short_help="Etkinlik klasörünü tarar, eşleşenleri kişi klasörlerine kopyalar.",
+)
 def scan_command(
     kaynak: Annotated[
         Path,
@@ -352,7 +359,13 @@ def panel_command(
     console.print("Fotoğraflar bu bilgisayardan çıkmaz.")
     if tarayici:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
-    uvicorn.run("recognize.web:app", host="127.0.0.1", port=port, log_level="info")
+    uvicorn.run(
+        "recognize.web:app",
+        host="127.0.0.1",
+        port=port,
+        log_level="info",
+        proxy_headers=False,
+    )
 
 
 def _engine() -> FaceEngine:
