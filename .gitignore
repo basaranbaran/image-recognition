@@ -1,0 +1,33 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.py[cod]
+.DS_Store
+veri/
+cikti/
+modeller/
+tekil-havuz/
+
+# Etkinlik fotoğrafları, kişi verisi ve tarama çıktıları depoya girmez
+khas hackathon fotoğraf/
+last-day/
+limoncloud-datas/
+outputs/
+cikti-*/
+
+# Fotoğraf, video ve yüz verisi hiçbir klasörden depoya girmez
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.heic
+*.heif
+*.mp4
+*.mov
+*.m4v
+*.avi
+*.mkv
+*.onnx
+*.npy
+*.log

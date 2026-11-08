@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Kamerayla tanıt</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/static/kamera.css?v=3" />
+  </head>
+  <body class="cam-body">
+    <main class="cam" id="cam" data-phase="idle">
+      <nav class="cam-top">
+        <a class="cam-back" href="/">Arşive dön</a>
+        <span id="who" class="cam-who"></span>
+      </nav>
+
+      <header class="cam-head">
+        <h1>Kamerayla tanıt</h1>
+        <p class="cam-lede">
+          Başını yavaşça çevir. Çemberin her yanı dolunca kayıt kendiliğinden yazılır.
+        </p>
+      </header>
+
+      <section class="viewfinder" id="viewfinder" data-state="idle" aria-hidden="true">
+        <div class="feed" id="feed">
+          <div class="flip">
+            <video id="video" playsinline muted autoplay></video>
+          </div>
+          <svg class="glyph" viewBox="0 0 100 100" focusable="false">
+            <ellipse cx="50" cy="46" rx="20" ry="25" />
+            <path d="M22 92c4-14 15-21 28-21s24 7 28 21" />
+          </svg>
+        </div>
+        <div class="ring" id="ring"></div>
+        <span class="nudge" id="nudge"></span>
+        <svg class="check" viewBox="0 0 52 52" focusable="false">
+          <path d="M14 27l8 8 16-18" />
+        </svg>
+      </section>
+
+      <div class="cam-copy">
+        <p id="instruction" class="cam-instruction" aria-live="polite">Ad soyadı yazıp kamerayı aç</p>
+        <p id="detail" class="cam-detail" role="status"></p>
+      </div>
+
+      <ol id="coverage" class="chips" aria-label="Açılar">
+        <li data-region="left"><span class="chip-label">Sola dön</span> <span class="chip-count">0/4</span></li>
+        <li data-region="right"><span class="chip-label">Sağa dön</span> <span class="chip-count">0/4</span></li>
+        <li data-region="up"><span class="chip-label">Biraz yukarı bak</span> <span class="chip-count">0/3</span></li>
+        <li data-region="down"><span class="chip-label">Biraz aşağı bak</span> <span class="chip-count">0/3</span></li>
+        <li data-region="center"><span class="chip-label">Düz bak</span> <span class="chip-count">0/2</span></li>
+      </ol>
+
+      <form id="camera-form" class="cam-form">
+        <label for="camera-name">Ad soyad</label>
+        <div class="cam-row">
+          <input
+            id="camera-name"
+            name="name"
+            type="text"
+            maxlength="80"
+            autocomplete="name"
+            placeholder="Örn. Ayşe Yılmaz"
+            required
+          />
+          <button class="cam-primary" id="open-camera" type="submit">Kamerayı aç</button>
+        </div>
+        <p id="name-hint" class="cam-hint" hidden></p>
+      </form>
+
+      <div class="cam-actions" id="live-actions" hidden>
+        <button type="button" class="cam-ghost" id="stop-camera">Vazgeç</button>
+      </div>
+
+      <section class="done" id="done" hidden>
+        <p id="saved" class="cam-detail" role="status"></p>
+        <div id="crops" class="crops"></div>
+        <div class="cam-actions">
+          <a class="cam-primary" href="/">Arşive dön</a>
+          <button type="button" class="cam-ghost" id="again">Bir tur daha</button>
+          <button type="button" class="cam-ghost" id="retry" hidden>Kaydı yeniden dene</button>
+        </div>
+      </section>
+
+      <p class="cam-foot">
+        Bu kamerada derinlik sensörü yok. Kayıt, dönüş boyunca alınan çok açılı yüz yapısıdır; her
+        açı ayrı saklanır, ortalaması alınmaz. Görüntü ayna gibidir ve bu bilgisayardan çıkmaz.
+      </p>
+      <noscript>
+        <p class="cam-foot">Kamera için JavaScript gerekir. Paneli bu bilgisayarda açık tutun.</p>
+      </noscript>
+    </main>
+    <script src="/static/kamera.js?v=10"></script>
+  </body>
+</html>

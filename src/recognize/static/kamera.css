@@ -1,0 +1,548 @@
+:root {
+  --bg: #0b0c0f;
+  --ink: #f5f5f7;
+  --muted: rgba(245, 245, 247, 0.64);
+  --faint: rgba(245, 245, 247, 0.16);
+  --line: rgba(245, 245, 247, 0.14);
+  --tick: rgba(245, 245, 247, 0.2);
+  --live: rgba(245, 245, 247, 0.92);
+  --done: #30d158;
+  --accent: #0a84ff;
+  --warn: #ffd60a;
+  --bad: #ff6961;
+  --ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 1.45;
+  letter-spacing: -0.011em;
+}
+
+.cam {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 8px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cam-top {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+}
+
+.cam-back {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cam-back::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-right: 10px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.cam-who {
+  color: var(--muted);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
+.cam-head {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.cam-head h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.cam-lede {
+  margin: 8px auto 0;
+  max-width: 26rem;
+  color: var(--muted);
+}
+
+.cam[data-phase="live"] .cam-head,
+.cam[data-phase="done"] .cam-head {
+  display: none;
+}
+
+/* Viewfinder: a circle of live video inside a ring of 72 ticks. */
+.viewfinder {
+  --size: min(84vw, 52vh, 420px);
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  margin-top: 24px;
+  container-type: inline-size;
+  flex: 0 0 auto;
+}
+
+.feed {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #16181d;
+  box-shadow:
+    0 0 0 2px var(--faint),
+    0 24px 60px rgba(0, 0, 0, 0.55);
+  transition:
+    box-shadow 240ms var(--ease),
+    opacity 320ms var(--ease);
+  isolation: isolate;
+}
+
+.viewfinder.center-done .feed {
+  box-shadow:
+    0 0 0 2px var(--done),
+    0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* A live warning outranks a finished centre. */
+.viewfinder[data-state="warn"] .feed {
+  box-shadow:
+    0 0 0 2px var(--warn),
+    0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.viewfinder[data-state="done"] .feed {
+  opacity: 0.32;
+}
+
+.flip {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(-1);
+}
+
+.flip video {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  opacity: 0;
+  transition: opacity 320ms var(--ease);
+  will-change: transform;
+}
+
+.viewfinder.streaming .flip video {
+  opacity: 1;
+}
+
+.glyph {
+  position: absolute;
+  inset: 18%;
+  fill: none;
+  stroke: var(--faint);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: opacity 240ms var(--ease);
+}
+
+.viewfinder.streaming .glyph,
+.viewfinder[data-state="done"] .glyph {
+  opacity: 0;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tick {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 6cqw;
+  margin-left: -1.5px;
+  margin-top: -6cqw;
+  border-radius: 2px;
+  background: var(--tick);
+  transform-origin: 50% 100%;
+  transform: rotate(var(--a)) translateY(-41cqw) scaleY(var(--s, 1));
+  transition: background-color 240ms var(--ease);
+}
+
+.tick.lit {
+  background: var(--done);
+}
+
+.tick.live:not(.lit) {
+  background: var(--live);
+}
+
+.tick.pop {
+  animation: pop 420ms var(--ease);
+}
+
+@keyframes pop {
+  0% {
+    background: #ffffff;
+  }
+  100% {
+    background: var(--done);
+  }
+}
+
+.viewfinder[data-state="done"] .tick {
+  background: var(--done);
+}
+
+/* Points toward the next direction when the head is resting in the middle. */
+.nudge {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-top: 3px solid var(--ink);
+  border-left: 3px solid var(--ink);
+  border-radius: 2px;
+  opacity: 0;
+  transform: rotate(var(--n, 0deg)) translateY(-51cqw) rotate(45deg);
+  transition: opacity 200ms var(--ease);
+  pointer-events: none;
+}
+
+.nudge.on {
+  opacity: 0.9;
+  animation: nudge 1.4s var(--ease) infinite;
+}
+
+@keyframes nudge {
+  0%,
+  100% {
+    transform: rotate(var(--n, 0deg)) translateY(-51cqw) rotate(45deg);
+  }
+  50% {
+    transform: rotate(var(--n, 0deg)) translateY(-53.5cqw) rotate(45deg);
+  }
+}
+
+.check {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30%;
+  height: 30%;
+  margin: -15% 0 0 -15%;
+  fill: none;
+  stroke: var(--done);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 240ms var(--ease),
+    transform 360ms var(--ease);
+}
+
+.viewfinder[data-state="done"] .check {
+  opacity: 1;
+  transform: scale(1);
+  animation: draw 480ms 120ms var(--ease) forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Copy */
+.cam-copy {
+  margin-top: 20px;
+  min-height: 5.4em;
+  text-align: center;
+  width: 100%;
+}
+
+.cam-instruction {
+  margin: 0;
+  font-size: clamp(1.5rem, 4.6vw, 1.875rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  transition: color 200ms var(--ease);
+}
+
+.viewfinder[data-state="warn"] ~ .cam-copy .cam-instruction {
+  color: var(--warn);
+}
+
+.cam-detail {
+  margin: 8px 0 0;
+  min-height: 1.45em;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.cam-detail[data-kind="ok"] {
+  color: var(--done);
+}
+
+.cam-detail[data-kind="bad"] {
+  color: var(--bad);
+}
+
+.cam-detail[data-kind="warn"] {
+  color: var(--warn);
+}
+
+/* Coverage chips */
+.chips {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(245, 245, 247, 0.08);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  transition:
+    background-color 240ms var(--ease),
+    color 240ms var(--ease);
+}
+
+.chip-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.chips li.is-next {
+  background: rgba(245, 245, 247, 0.16);
+  color: var(--ink);
+}
+
+.chips li.is-done {
+  background: rgba(48, 209, 88, 0.16);
+  color: var(--done);
+}
+
+/* Form and buttons */
+.cam-form {
+  width: 100%;
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cam-form label {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.cam-row {
+  display: flex;
+  gap: 8px;
+}
+
+.cam-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(245, 245, 247, 0.06);
+  color: var(--ink);
+  font: inherit;
+}
+
+.cam-row input:read-only {
+  color: var(--muted);
+}
+
+.cam-primary,
+.cam-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 600;
+  letter-spacing: -0.011em;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 100ms var(--ease),
+    opacity 160ms var(--ease);
+}
+
+.cam-primary {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+}
+
+.cam-ghost {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+
+.cam-primary:active,
+.cam-ghost:active {
+  transform: scale(0.97);
+}
+
+.cam-primary:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.cam-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cam[data-phase="live"] .cam-form,
+.cam[data-phase="done"] .cam-form,
+.cam[data-phase="idle"] .chips,
+.cam[data-phase="done"] .chips {
+  display: none;
+}
+
+.cam[data-phase="idle"] .cam-copy {
+  min-height: 0;
+}
+
+.cam-hint {
+  margin: 0;
+  color: var(--warn);
+  font-size: 14px;
+}
+
+/* Finished */
+.done {
+  width: 100%;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.crops {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+
+.crops img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  background: #16181d;
+}
+
+.cam-foot {
+  margin: 32px 0 0;
+  max-width: 30rem;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed,
+  .flip video,
+  .glyph,
+  .tick,
+  .nudge,
+  .check,
+  .chips li,
+  .cam-primary,
+  .cam-ghost {
+    transition: opacity 200ms linear;
+  }
+
+  .tick.pop,
+  .nudge.on {
+    animation: none;
+  }
+
+  .viewfinder[data-state="done"] .check {
+    animation: none;
+    stroke-dashoffset: 0;
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --tick: rgba(245, 245, 247, 0.45);
+    --muted: rgba(245, 245, 247, 0.85);
+    --line: rgba(245, 245, 247, 0.5);
+  }
+}

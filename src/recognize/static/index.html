@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" id="theme-color" content="#f5f5f7" />
+    <title>Etkinlik arşivi</title>
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+    <script src="/static/theme.js?v=1"></script>
+    <link rel="stylesheet" href="/static/app.css?v=12" />
+  </head>
+  <body>
+    <svg hidden aria-hidden="true" focusable="false">
+      <symbol id="i-lock" viewBox="0 0 20 20"><rect x="4" y="9" width="12" height="8" rx="2"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9"/></symbol>
+      <symbol id="i-off" viewBox="0 0 20 20"><path d="M3 3l14 14M8.5 8.5A5 5 0 0 0 10 15a5 5 0 0 0 3.5-1.5M10 5a5 5 0 0 1 5 5"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 20 20"><path d="M2.5 5.5A1.5 1.5 0 0 1 4 4h3.5l2 2H16a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 16 16H4a1.5 1.5 0 0 1-1.5-1.5z"/></symbol>
+      <symbol id="i-camera" viewBox="0 0 20 20"><path d="M2.5 7A1.5 1.5 0 0 1 4 5.5h2l1.2-1.6h5.6L14 5.5h2A1.5 1.5 0 0 1 17.5 7v7.5A1.5 1.5 0 0 1 16 16H4a1.5 1.5 0 0 1-1.5-1.5z"/><circle cx="10" cy="10.5" r="3"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></symbol>
+      <symbol id="i-x" viewBox="0 0 20 20"><path d="M5 5l10 10M15 5L5 15"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 20 20"><path d="M16.2 12.6A6.6 6.6 0 0 1 7.4 3.8a6.6 6.6 0 1 0 8.8 8.8z"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.2"/><path d="M10 2.6v1.9M10 15.5v1.9M2.6 10h1.9M15.5 10h1.9M4.7 4.7l1.3 1.3M14 14l1.3 1.3M4.7 15.3L6 14M14 6l1.3-1.3"/></symbol>
+      <symbol id="i-check" viewBox="0 0 20 20"><path d="M4 10.5l4 4 8-9"/></symbol>
+      <symbol id="i-chevron" viewBox="0 0 20 20"><path d="M7.5 4.5L13 10l-5.5 5.5"/></symbol>
+      <symbol id="i-image" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="7.5" cy="8.5" r="1.5"/><path d="M17 13l-4-4-6 6"/></symbol>
+      <symbol id="i-stop" viewBox="0 0 20 20"><rect x="5" y="5" width="10" height="10" rx="2"/></symbol>
+      <symbol id="i-open" viewBox="0 0 20 20"><path d="M11 3h6v6M17 3l-8 8M15 11v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></symbol>
+      <symbol id="i-undo" viewBox="0 0 20 20"><path d="M4 8h8a4 4 0 0 1 0 8H8M4 8l3-3M4 8l3 3"/></symbol>
+      <symbol id="i-warn" viewBox="0 0 20 20"><path d="M10 3l7.5 13h-15z"/><path d="M10 8v3.5M10 14v.5"/></symbol>
+      <symbol id="i-search" viewBox="0 0 20 20"><circle cx="9" cy="9" r="5.5"/><path d="M13 13l4 4"/></symbol>
+      <symbol id="i-play" viewBox="0 0 20 20"><path d="M6 4l10 6-10 6z"/></symbol>
+      <symbol id="i-person" viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.5"/><path d="M3.5 17c1-3.5 3.5-5 6.5-5s5.5 1.5 6.5 5"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 20 20"><path d="M4 6h12M8 6V4h4v2M6 6l.8 10h6.4L14 6"/></symbol>
+      <symbol id="i-film" viewBox="0 0 20 20"><rect x="3" y="4" width="14" height="12" rx="2"/><path d="M6 4v12M14 4v12M3 8h3M3 12h3M14 8h3M14 12h3"/></symbol>
+      <symbol id="i-info" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 6.5v.5"/></symbol>
+    </svg>
+
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="/">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>Etkinlik arşivi</span>
+        </a>
+        <nav class="segnav" aria-label="Bölümler">
+          <a href="#sonuclar">Sonuçlar</a>
+          <a href="#kisiler">Kişiler</a>
+          <a href="#ayir">Ayırma</a>
+        </nav>
+        <a class="pill activity" id="activity" href="#ayir" hidden>
+          <span class="activity-ring" aria-hidden="true"><i id="activity-arc"></i></span>
+          <span id="activity-text">Ayırma sürüyor</span>
+        </a>
+        <span class="pill conn" id="conn" data-state="ok" title="Fotoğraflar bu bilgisayardan çıkmaz">
+          <svg class="ic" aria-hidden="true"><use href="#i-lock" /></svg>
+          <span id="conn-text">Yerel</span>
+        </span>
+        <button type="button" class="btn icon quiet" id="theme-toggle" aria-label="Koyu temaya geç" title="Koyu tema">
+          <svg class="ic" aria-hidden="true"><use href="#i-moon" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="banner" id="banner" role="alert" hidden>
+      <svg class="ic" aria-hidden="true"><use href="#i-warn" /></svg>
+      <p id="banner-text"></p>
+      <button type="button" class="btn small" id="banner-retry">Yeniden dene</button>
+    </div>
+
+    <main class="page" id="page" data-ready="0">
+      <section class="hero" id="hero" hidden aria-labelledby="hero-title">
+        <div class="hero-ring" id="hero-ring" aria-hidden="true">
+          <svg class="hero-glyph" viewBox="0 0 100 100" focusable="false">
+            <ellipse cx="50" cy="44" rx="18" ry="22" />
+            <path d="M24 90c4-13 14-20 26-20s22 7 26 20" />
+          </svg>
+        </div>
+        <h1 id="hero-title" class="t-title1">Fotoğraflarda kendinizi bulun.</h1>
+        <p class="t-body muted measure">
+          Yüzünüzü bir kez tanıtın. Etkinliğin yüzlerce fotoğraf ve videosu kişi klasörlerine
+          kendiliğinden ayrılsın. Hiçbir dosya bu bilgisayardan çıkmaz.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="/kamera">
+            <svg class="ic" aria-hidden="true"><use href="#i-camera" /></svg>Kamerayla tanıt
+          </a>
+          <button type="button" class="btn" id="hero-photo">Fotoğrafla tanıt</button>
+        </div>
+      </section>
+
+      <header class="page-head" id="page-head" hidden>
+        <h1 class="t-title1">Etkinlik arşivi</h1>
+        <p class="t-callout muted" id="status-line"></p>
+      </header>
+
+      <section id="sonuclar" class="section" aria-labelledby="results-title" hidden>
+        <div class="stage" id="stage">
+          <div class="stage-ring" id="stage-ring" aria-hidden="true">
+            <div class="stage-center">
+              <span class="stage-number tabular" id="stage-number">0</span>
+              <span class="stage-label" id="stage-label">dosya ayrıldı</span>
+            </div>
+          </div>
+          <div class="stage-copy">
+            <p class="stage-eyebrow t-caption" id="results-eyebrow">Son ayırma</p>
+            <h2 id="results-title" class="t-title2"></h2>
+            <p class="t-footnote stage-meta" id="results-meta"></p>
+            <div class="stage-people" id="stage-people"></div>
+            <div class="stage-actions" id="results-actions"></div>
+          </div>
+        </div>
+        <div class="notice" id="results-notice" hidden></div>
+        <div class="group" id="results-people"></div>
+        <details class="group details" id="unmatched" hidden>
+          <summary class="row">
+            <span class="row-main"><span class="t-headline" id="unmatched-title"></span></span>
+            <svg class="ic chev" aria-hidden="true"><use href="#i-chevron" /></svg>
+          </summary>
+          <div id="unmatched-list"></div>
+        </details>
+      </section>
+
+      <section id="kisiler" class="section" aria-labelledby="people-title">
+        <div class="section-head">
+          <div>
+            <h2 id="people-title" class="t-title2">Kişiler</h2>
+            <p class="t-footnote muted">Her açı ayrı saklanır; eşleşme en yakın açıya bakar, ortalamaya değil.</p>
+          </div>
+          <div class="section-actions">
+            <button type="button" class="btn small" id="open-enroll">
+              <svg class="ic" aria-hidden="true"><use href="#i-image" /></svg>Fotoğrafla tanıt
+            </button>
+          </div>
+        </div>
+        <div class="notice warn" id="people-problems" hidden></div>
+        <div id="people" class="people-grid" aria-busy="true"></div>
+      </section>
+
+      <section id="ayir" class="section" aria-labelledby="scan-title">
+        <div class="section-head">
+          <div>
+            <h2 id="scan-title" class="t-title2">Fotoğrafları ayır</h2>
+            <p class="t-footnote muted">Eşleşen dosyalar kişi klasörlerine kopyalanır. Kaynak silinmez.</p>
+          </div>
+        </div>
+
+        <section class="progress-card" id="job" hidden aria-labelledby="job-title" aria-live="off">
+          <div class="job-head">
+            <div class="job-copy">
+              <p class="t-headline" id="job-title">Ayırma sürüyor</p>
+              <p class="t-footnote muted mono-path" id="job-current"></p>
+            </div>
+            <img class="job-thumb" id="job-thumb" alt="" hidden decoding="async" />
+          </div>
+          <div class="meter" id="meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="job-title">
+            <span id="meter-fill"></span>
+          </div>
+          <div class="job-foot">
+            <p class="t-footnote muted" id="job-eta"></p>
+            <div class="job-people" id="job-people"></div>
+            <div class="job-actions" id="job-actions"></div>
+          </div>
+          <p class="t-callout" id="job-status" role="status"></p>
+        </section>
+
+        <form id="scan" class="settings" novalidate>
+          <fieldset id="scan-fields" class="fieldset">
+            <p class="group-label t-caption">Klasörler</p>
+            <div class="group">
+              <div class="row">
+                <span class="row-tile blue" aria-hidden="true"><svg class="ic"><use href="#i-folder" /></svg></span>
+                <div class="row-main">
+                  <span class="t-headline" id="source-label">Kaynak klasör</span>
+                  <span class="t-footnote muted path" id="source-path">Seçilmedi</span>
+                </div>
+                <button type="button" class="btn small" id="source-pick" aria-describedby="source-label">Değiştir…</button>
+              </div>
+              <div class="row manual" id="source-manual" hidden>
+                <label class="t-footnote muted" for="source">Yolu yazın</label>
+                <input id="source" name="source" type="text" spellcheck="false" autocomplete="off" />
+              </div>
+              <div class="row">
+                <span class="row-tile indigo" aria-hidden="true"><svg class="ic"><use href="#i-folder" /></svg></span>
+                <div class="row-main">
+                  <span class="t-headline" id="destination-label">Çıktı klasörü</span>
+                  <span class="t-footnote muted path" id="destination-path">Seçilmedi</span>
+                </div>
+                <button type="button" class="btn small" id="destination-pick" aria-describedby="destination-label">Değiştir…</button>
+              </div>
+              <div class="row manual" id="destination-manual" hidden>
+                <label class="t-footnote muted" for="destination">Yolu yazın</label>
+                <input id="destination" name="destination" type="text" spellcheck="false" autocomplete="off" />
+              </div>
+              <p class="row-note t-footnote" id="pick-status" role="status" hidden></p>
+            </div>
+
+            <div class="group">
+              <div class="row">
+                <span class="row-tile green" aria-hidden="true"><svg class="ic"><use href="#i-search" /></svg></span>
+                <div class="row-main">
+                  <span class="t-headline">Tekil havuz</span>
+                  <span class="t-footnote muted" id="pool-note">İsteğe bağlı · aynı dosyalar bir kez tutulur, boş ve açılmayan dosyalar alınmaz</span>
+                  <span class="t-footnote" id="pool-status" role="status" hidden></span>
+                </div>
+                <button type="button" class="btn small" id="pool-start">Ayıkla</button>
+              </div>
+            </div>
+
+            <p class="group-label t-caption">Kişiler ve ayarlar</p>
+            <div class="group" id="who-group">
+              <div class="row row-stack">
+                <div class="row-head">
+                  <span class="row-title"><span class="row-tile purple" aria-hidden="true"><svg class="ic"><use href="#i-person" /></svg></span><span class="t-headline" id="who-label">Kimler için ayrılsın?</span></span>
+                  <span class="who-tools">
+                    <button type="button" class="link" id="who-all">Tümü</button>
+                    <button type="button" class="link" id="who-none">Hiçbiri</button>
+                  </span>
+                </div>
+                <div class="who-list" id="who-list" role="group" aria-labelledby="who-label"></div>
+                <p class="t-footnote muted" id="who-note"></p>
+              </div>
+            </div>
+
+            <details class="group details" id="advanced">
+              <summary class="row">
+                <span class="row-tile grey" aria-hidden="true"><svg class="ic"><use href="#i-info" /></svg></span>
+                <span class="row-main">
+                  <span class="t-headline">Gelişmiş ayarlar</span>
+                  <span class="t-footnote muted" id="advanced-summary">Varsayılan değerler</span>
+                </span>
+                <svg class="ic chev" aria-hidden="true"><use href="#i-chevron" /></svg>
+              </summary>
+              <div class="row row-stack">
+                <div class="row-head">
+                  <label class="t-headline" for="threshold">Benzerlik eşiği</label>
+                  <output class="t-headline tabular" id="threshold-out" for="threshold">0,50</output>
+                </div>
+                <input id="threshold" name="threshold" type="range" min="0.2" max="0.8" step="0.01" value="0.5" list="threshold-ticks" />
+                <datalist id="threshold-ticks">
+                  <option value="0.36" label="0,36"></option>
+                  <option value="0.5" label="0,50"></option>
+                </datalist>
+                <div class="range-ends t-caption muted" aria-hidden="true"><span>Daha çok bulur</span><span>Daha az yanılır</span></div>
+                <p class="t-footnote muted measure" id="threshold-hint">Varsayılan eşik 0,50. Kayıtlı yan açılar bu çizginin üstünde kalır. 0,36 kalabalıkta başka insanları da alır.</p>
+              </div>
+              <div class="row">
+                <div class="row-main">
+                  <label class="t-headline" for="interval">Video aralığı</label>
+                  <span class="t-footnote muted measure" id="video-hint">Videoda varsayılan aralık 0,5 saniyedir; kısa bir yan bakış da yakalanabilsin.</span>
+                </div>
+                <span class="unit-field"><input id="interval" name="interval" type="number" inputmode="decimal" min="0.2" max="5" step="0.1" value="0.5" /><span class="t-callout muted">sn</span></span>
+              </div>
+              <div class="row">
+                <span class="row-main"></span>
+                <button type="button" class="btn small" id="advanced-reset">Varsayılana dön</button>
+              </div>
+            </details>
+
+            <div class="group">
+              <label class="row switch-row" for="move">
+                <span class="row-tile orange" aria-hidden="true"><svg class="ic"><use href="#i-open" /></svg></span>
+                <span class="row-main">
+                  <span class="t-headline">Kopyalamak yerine taşı</span>
+                  <span class="t-footnote muted">Eşleşen dosya kaynak klasörden silinir. Aynı karede birden fazla kişi varsa her klasöre yazılır.</span>
+                </span>
+                <span class="switch"><input id="move" name="move" type="checkbox" role="switch" /><span class="knob" aria-hidden="true"></span></span>
+              </label>
+              <div class="row warn-row" id="move-warning" hidden>
+                <svg class="ic" aria-hidden="true"><use href="#i-warn" /></svg>
+                <span class="t-footnote">Taşıma geri alınamaz: eşleşen dosyalar yalnızca kişi klasörlerinde kalır. Önce bir yedek alın.</span>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="start-card" id="start-card">
+            <div class="start-copy">
+              <p class="t-headline" id="start-title">Hazır</p>
+              <p class="t-footnote muted" id="start-note"></p>
+              <ul class="checklist t-footnote" id="preflight" hidden></ul>
+            </div>
+            <button class="btn primary big" id="start" type="submit">Ayırmayı başlat</button>
+          </div>
+        </form>
+      </section>
+
+      <footer class="footnote t-footnote muted measure">
+        YuNet ve SFace (OpenCV, Apache 2.0) bu bilgisayarda çalışır. Fotoğraflar, yüz vektörleri ve
+        raporlar hiçbir yere yüklenmez.
+      </footer>
+    </main>
+
+    <dialog class="sheet" id="person-sheet" aria-labelledby="sheet-title">
+      <div class="sheet-head">
+        <div class="sheet-title">
+          <img class="avatar small" id="sheet-cover" alt="" hidden />
+          <div>
+            <h2 class="t-title2" id="sheet-title"></h2>
+            <p class="t-footnote muted" id="sheet-meta"></p>
+          </div>
+        </div>
+        <div class="sheet-tools">
+          <div class="filters" role="group" aria-label="Süzgeç" id="sheet-filters">
+            <button type="button" class="filter" data-filter="all" aria-pressed="true">Tümü</button>
+            <button type="button" class="filter" data-filter="review" aria-pressed="false">Kontrol et</button>
+          </div>
+          <button type="button" class="btn small" id="sheet-open">Finder'da göster</button>
+          <button type="button" class="btn icon" id="sheet-close" aria-label="Kapat"><svg class="ic" aria-hidden="true"><use href="#i-x" /></svg></button>
+        </div>
+      </div>
+      <p class="t-footnote muted" id="sheet-hint">Yanlış bir eşleşme görürseniz «Bu kişi değil» deyin. Fotoğraf silinmez; yalnızca bu kişinin klasöründen çıkarılır.</p>
+      <div id="sheet-leftovers" hidden></div>
+      <div class="tiles" id="sheet-grid"></div>
+      <section class="rejected" id="sheet-rejected" hidden>
+        <h3 class="t-headline">Ayıklananlar</h3>
+        <div class="tiles" id="sheet-rejected-grid"></div>
+      </section>
+    </dialog>
+
+    <dialog class="lightbox" id="lightbox" aria-label="Büyük önizleme">
+      <button type="button" class="btn icon on-dark" id="lightbox-close" aria-label="Kapat"><svg class="ic" aria-hidden="true"><use href="#i-x" /></svg></button>
+      <div class="lightbox-stage" id="lightbox-stage">
+        <img id="lightbox-img" alt="" decoding="async" />
+        <span class="face-box" id="lightbox-box" hidden></span>
+      </div>
+      <p class="t-footnote lightbox-caption" id="lightbox-caption"></p>
+    </dialog>
+
+    <dialog class="sheet enroll" id="enroll-dialog" aria-labelledby="enroll-title">
+      <form id="enroll" class="settings" novalidate>
+        <div class="sheet-head">
+          <h2 class="t-title2" id="enroll-title">Fotoğrafla tanıt</h2>
+          <button type="button" class="btn icon" id="enroll-close" aria-label="Kapat"><svg class="ic" aria-hidden="true"><use href="#i-x" /></svg></button>
+        </div>
+        <p id="guidance" class="t-footnote muted measure">Aynı kişi her karede karşıdan bakmaz. Önden, soldan, sağdan ve gözleri kapalı birer fotoğraf ekleyin. Her yüz ayrı saklanır; eşleşme bu karelerin en yakın olanına bakar.</p>
+        <p id="one-photo" class="t-footnote muted measure">Tek önden fotoğrafla da kaydedilir. Yan açılar o zaman daha sık kaçar.</p>
+
+        <div class="field">
+          <label class="t-headline" for="person-name">Ad soyad</label>
+          <input id="person-name" name="name" type="text" maxlength="80" autocomplete="name" placeholder="Örn. Ayşe Yılmaz" required />
+          <p class="t-footnote hint" id="name-hint" hidden></p>
+        </div>
+
+        <label class="drop" id="drop">
+          <input id="files" name="files" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic,.heif" multiple />
+          <svg class="ic big" aria-hidden="true"><use href="#i-image" /></svg>
+          <span class="t-headline">Fotoğrafları seçin veya buraya bırakın</span>
+          <span class="t-footnote muted">JPG, PNG, WebP veya HEIC · en fazla 12 dosya, her biri 20 MB</span>
+          <span class="t-footnote" id="drop-status" role="status"></span>
+        </label>
+
+        <div id="preview" class="preview"></div>
+
+        <div class="field">
+          <label class="t-headline" for="clothing">Bu etkinlikte belirgin kıyafet</label>
+          <select id="clothing" name="clothing">
+            <option value="">Yok</option>
+            <option value="sari">sarı</option>
+            <option value="kirmizi">kırmızı</option>
+            <option value="mavi">mavi</option>
+            <option value="yesil">yeşil</option>
+            <option value="siyah">siyah</option>
+            <option value="beyaz">beyaz</option>
+          </select>
+          <p id="clothing-note" class="t-footnote muted measure">Kıyafeti yalnızca kişi o gün kalabalıkta ondan başka kimsenin giymediği tek bir renk giydiyse seçin; emin değilseniz boş bırakın. Kıyafet tek başına kimseyi seçmez, zayıf bir yüz eşleşmesine destek olur.</p>
+        </div>
+
+        <div class="sheet-actions">
+          <p class="t-callout" id="enroll-status" role="status"></p>
+          <button class="btn primary" id="save" type="submit">Kişiyi kaydet</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="confirm" id="move-dialog" aria-labelledby="move-title">
+      <h2 class="t-headline" id="move-title">Eşleşen dosyalar kaynaktan silinecek</h2>
+      <p class="t-callout muted" id="move-text">Dosyalar kişi klasörlerine taşınır ve kaynak klasörden silinir. Bu geri alınamaz.</p>
+      <div class="confirm-actions">
+        <button type="button" class="btn" id="move-cancel">Vazgeç</button>
+        <button type="button" class="btn danger" id="move-ok">Taşımayı başlat</button>
+      </div>
+    </dialog>
+
+    <dialog class="confirm" id="delete-dialog" aria-labelledby="delete-title">
+      <h2 class="t-headline" id="delete-title">Kişi silinsin mi?</h2>
+      <p class="t-callout muted" id="delete-text"></p>
+      <div class="confirm-actions">
+        <button type="button" class="btn" id="delete-cancel">Vazgeç</button>
+        <button type="button" class="btn danger" id="delete-ok">Sil</button>
+      </div>
+    </dialog>
+
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+    <div class="sr-only" id="announce" aria-live="polite" aria-atomic="true"></div>
+    <script src="/static/app.js?v=13"></script>
+  </body>
+</html>
